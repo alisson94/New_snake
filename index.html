@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href='https://fonts.googleapis.com/css?family=Pixelify Sans' rel='stylesheet'>
+    <title>Snake</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main>
+        <div class="menu">
+            <p class="jogar">Jogar</p>
+            <p class="dificuldade">Dificuldade:</p>
+            <div class="dificuldades">
+                    <div>
+                        <label for="facil">Facil</label>
+                        <input id="facil" name="dificuldade"  type="radio" value="Facil">
+                    </div>
+                    <div>
+                        <label for="normal">Normal</label>
+                        <input checked id="normal" name="dificuldade" type="radio" value="Normal">
+                    </div>
+                    <div>
+                        <label for="dificil">Difícil</label>
+                        <input id="dificil" name="dificuldade" type="radio" value="Dificil">
+    
+                    </div>
+                    <div>
+                        <label for="muitodificil">Muito difícil</label>
+                        <input id="muitodificil" name="dificuldade" type="radio" value="Muito Dificil">
+    
+                    </div>
+
+            </div>
+
+        </div>
+        <canvas></canvas>
+    </main>
+    <script src="listeners.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
