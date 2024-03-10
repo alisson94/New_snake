@@ -1,172 +1,15 @@
 let canvas = document.querySelector('canvas')
 let ctx = canvas.getContext('2d')
 
-canvas.width = 800
+canvas.width = 900
 canvas.height = 600
 
 let gameOver = false
 let pontos = 0
 
-class Snake{
-    constructor(){
-        this.velocidade = 2
-        this.tamanho = 20
-        this.corpo = []
-        this.adicionar = false
-        
-        for (let i = 0; i < 3; i++) {
-            this.corpo.push({
-                x: 100 - i*this.tamanho,
-                y: 100,
-                direcao: "direita",
-                proxima_direcao: 'direita'
-            })
-            
-        }
-    }
-    mover() {
-        
-    }
-    aumentar(){
-        this.adicionar = true
-        pontos += 10
-    }
-    desenhar(){
-        this.corpo.forEach((pedaco,i) => {
-            let cor = 0 + (60-0)/(this.corpo.length + 5) * i
-            ctx.fillStyle = `hsl(${cor}, 100%, 50%)`
-            ctx.fillRect(pedaco.x, pedaco.y, snake.tamanho, snake.tamanho)
-        });
-        
-    }
-    atualizar(){
-        this.desenhar()
+let snake = new Snake()
+let jogo = new Jogo()
 
-        //ADICIONAR PEDACOS MUDAR DIRECAO DOS PEDACOS
-        if(this.corpo[0].x % this.tamanho == 0 && this.corpo[0].y % this.tamanho ==0){
-            console.log('virou')
-            
-            for (let i = this.corpo.length - 1; i > 0 ; i--) {
-                this.corpo[i].direcao = this.corpo[i-1].direcao;
-                
-            }
-            
-            this.corpo[0].direcao = this.corpo[0].proxima_direcao 
-
-            if(this.adicionar){
-                this.corpo.push({
-                    x: this.corpo[this.corpo.length-1].x,
-                    y: this.corpo[this.corpo.length-1].y,
-                    direcao: ''
-                })
-                this.adicionar = false
-            }
-        }
-
-        //VERIFICA COLISAO COM PAREDES
-        if(this.corpo[0].x + this.tamanho > canvas.width || this.corpo[0].x < 0 || this.corpo[0].y + this.tamanho > canvas.height || this.corpo[0].y < 0){
-            gameOver = true
-        }
-
-        this.corpo.forEach(pedaco => {
-
-            if(pedaco != this.corpo[0]){
-                
-                let cabeca = this.corpo[0]
-
-                switch (cabeca.direcao) {
-                    case "direita":
-                        if(cabeca.x + this.tamanho > pedaco.x && cabeca.x < pedaco.x && cabeca.y == pedaco.y){
-                            gameOver = true
-                        } 
-
-                        break;
-                    case "esquerda":
-                        if(cabeca.x > pedaco.x && cabeca.x < pedaco.x + this.tamanho && cabeca.y == pedaco.y){
-                            gameOver = true
-                        }   
-                    
-                    break;
-                    case "cima":
-                        if(cabeca.y > pedaco.y && cabeca.y < pedaco.y + this.tamanho && cabeca.x == pedaco.x){
-                            gameOver = true
-                        }   
-    
-                    break;
-                    case "baixo":
-                        if(cabeca.y + this.tamanho > pedaco.y && cabeca.y < pedaco.y && cabeca.x == pedaco.x){
-                            gameOver = true
-                        }   
-                    
-                    break;
-                    default:
-                        break;
-                }
-
-            }
-
-            switch (pedaco.direcao) {
-                case "direita":
-                    pedaco.x += this.velocidade    
-
-                    break;
-                case "esquerda":
-                    pedaco.x -= this.velocidade    
-                
-                break;
-                case "cima":
-                    pedaco.y -= this.velocidade    
-
-                break;
-                case "baixo":
-                    pedaco.y += this.velocidade    
-                
-                break;
-                default:
-                    break;
-            }
-        });
-
-
-
-    }
-}
-
-class Comida{
-    constructor({posicao}){
-        this.posicao = {
-            x: posicao.x,
-            y: posicao.y
-        }
-    }
-
-    desenhar(){
-        ctx.fillStyle = 'blue'
-        ctx.fillRect(this.posicao.x, this.posicao.y, snake.tamanho, snake.tamanho)
-    }
-    atualizar(){
-        this.desenhar()
-
-    }
-}
-
-class Jogo{
-    desenharFundo(){
-        for (let i = 0; i < canvas.width/snake.tamanho; i++) {
-            for (let j = 0; j < canvas.height/snake.tamanho; j++) {
-                ctx.fillStyle = (i+j)%2 == 0 ? '#00FF7F' : '#3CB371';
-                ctx.fillRect(i*snake.tamanho, j*snake.tamanho, snake.tamanho, snake.tamanho)
-                
-                
-            }
-            
-        }
-    }
-}
-
-let comidas = []
-const snake = new Snake()
-const jogo = new Jogo();
 
 function gerarComida() {
     let comidaX = Math.floor(Math.random() * canvas.width/snake.tamanho) * snake.tamanho
@@ -175,17 +18,53 @@ function gerarComida() {
     for (const parte of snake.corpo) {
         if(parte.x == comidaX && parte.y == comidaY){
             gerarComida()
+            return
+        }
+    }
+
+    for (const parte of jogo.paredes) {
+        if(parte.posicao.x == comidaX && parte.posicao.y == comidaY){
+            gerarComida()
+            return
         }
     }
 
     const comida = new Comida({
         posicao:{
-            x: comidaX,
+            x: comidaX, 
             y: comidaY
         }
 
     })
-    comidas.push(comida)
+    jogo.comidas.push(comida)
+}
+
+function gerarParede() {
+    let posicaoX = Math.floor(Math.random() * canvas.width/snake.tamanho) * snake.tamanho
+    let posicaoY = Math.floor(Math.random() * canvas.height/snake.tamanho) * snake.tamanho
+
+    for (const parte of snake.corpo) {
+        if(parte.x == posicaoX && parte.y == posicaoY){
+            gerarParede()
+            return
+        }
+    }
+
+    for (const parte of jogo.paredes) {
+        if(parte.posicao.x == posicaoX && parte.posicao.y == posicaoY){
+            gerarParede()
+            return
+        }
+    }
+
+    const parede = new Parede({
+        posicao:{
+            x: posicaoX,
+            y: posicaoY
+        }
+
+    })
+    jogo.paredes.push(parede)
 }
 
 function gui(){
@@ -197,8 +76,14 @@ function gui(){
 
 }
 
-gerarComida() 
 jogo.desenharFundo()
+
+function iniciar(){
+    snake = new Snake()
+    jogo = new Jogo()
+    gerarComida() 
+    loop()
+}
 
 //loop()
 function loop() {
@@ -208,20 +93,27 @@ function loop() {
 
     snake.atualizar()
 
-    comidas.forEach((comida, i)=>{
+    jogo.comidas.forEach((comida, i)=>{
         comida.atualizar()
 
         if(comida.posicao.x == snake.corpo[0].x && comida.posicao.y == snake.corpo[0].y){
-            comidas.splice(i, 1)
+            jogo.comidas.splice(i, 1)
+            snake.corpo.length%3 == 0 ? gerarParede() : null 
             gerarComida()
             snake.aumentar()
+
         }
+    })
+
+    jogo.paredes.forEach(parede => {
+        parede.atualizar()
     })
 
     gui()
 
     if(gameOver){
         console.log('game over')
+        document.querySelector('div.menu').style.display = 'flex'
     }else{
         window.requestAnimationFrame(loop)
 

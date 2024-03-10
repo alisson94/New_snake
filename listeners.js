@@ -32,7 +32,8 @@ addEventListener('keypress', (e)=>{
     }
 })
 
-botaoJogar.addEventListener('click', ()=>{
+document.querySelector('p.jogar').addEventListener('click', ()=>{
     document.querySelector('div.menu').style.display = 'none'
-    loop()
+    gameOver = false
+    iniciar()
 })
