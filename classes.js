@@ -32,7 +32,7 @@ class Snake{
 
         //ADICIONAR PEDACOS MUDAR DIRECAO DOS PEDACOS
         if(this.corpo[0].x % this.tamanho == 0 && this.corpo[0].y % this.tamanho ==0){
-            console.log('virou')
+            //console.log('virou')
             
             for (let i = this.corpo.length - 1; i > 0 ; i--) {
                 this.corpo[i].direcao = this.corpo[i-1].direcao;
@@ -66,7 +66,7 @@ class Snake{
         })
 
 
-        //VERIFICA COLISAO CONSIGO MESMO
+        //VERIFICA COLISAO CONSIGO MESMO E MOVIMENTA
         this.corpo.forEach(pedaco => {
 
             if(pedaco != cabeca){
@@ -146,7 +146,7 @@ class Jogo{
     desenharFundo(){
         for (let i = 0; i < canvas.width/snake.tamanho; i++) {
             for (let j = 0; j < canvas.height/snake.tamanho; j++) {
-                ctx.fillStyle = (i+j)%2 == 0 ? '#9370DB' : '#DDA0DD';
+                ctx.fillStyle = (i+j)%2 == 0 ? '#3CB371' : '#2E8B57';
                 ctx.fillRect(i*snake.tamanho, j*snake.tamanho, snake.tamanho, snake.tamanho)
                 
                 
