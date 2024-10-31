@@ -10,7 +10,6 @@ let pontos = 0
 let snake = new Snake()
 let jogo = new Jogo()
 
-
 function gerarComida() {
     let comidaX = Math.floor(Math.random() * canvas.width/snake.tamanho) * snake.tamanho
     let comidaY = Math.floor(Math.random() * canvas.height/snake.tamanho) * snake.tamanho
@@ -39,32 +38,53 @@ function gerarComida() {
     jogo.comidas.push(comida)
 }
 
-function gerarParede() {
+function gerarPosicao() {
     let posicaoX = Math.floor(Math.random() * canvas.width/snake.tamanho) * snake.tamanho
     let posicaoY = Math.floor(Math.random() * canvas.height/snake.tamanho) * snake.tamanho
+    return { x: posicaoX, y: posicaoY }
+}
 
-    for (const parte of snake.corpo) {
-        if(parte.x == posicaoX && parte.y == posicaoY){
-            gerarParede()
-            return
+function gerarParede() {
+    let posicao = gerarPosicao()
+
+    while (true) {
+        posicaoX = Math.floor(Math.random() * canvas.width/snake.tamanho) * snake.tamanho
+        posicaoY = Math.floor(Math.random() * canvas.height/snake.tamanho) * snake.tamanho
+
+        let found = false
+
+        for (const parte of snake.corpo) {
+            if(parte.x == posicaoX && parte.y == posicaoY){
+                found = true
+                break
+            }
         }
+
+        if (found) {
+            continue
+        }
+
+        for (const parte of jogo.paredes) {
+            if(parte.posicao.x == posicaoX && parte.posicao.y == posicaoY){
+                found = true
+                break
+            }
+        }
+
+        if (found) {
+            continue
+        }
+
+        const parede = new Parede({
+            posicao:{
+                x: posicaoX,
+                y: posicaoY
+            }
+        })
+
+        jogo.paredes.push(parede)
+        break
     }
-
-    for (const parte of jogo.paredes) {
-        if(parte.posicao.x == posicaoX && parte.posicao.y == posicaoY){
-            gerarParede()
-            return
-        }
-    }
-
-    const parede = new Parede({
-        posicao:{
-            x: posicaoX,
-            y: posicaoY
-        }
-
-    })
-    jogo.paredes.push(parede)
 }
 
 function gui(){
@@ -93,17 +113,7 @@ function loop() {
 
     snake.atualizar()
 
-    jogo.comidas.forEach((comida, i)=>{
-        comida.atualizar()
-
-        if(comida.posicao.x == snake.corpo[0].x && comida.posicao.y == snake.corpo[0].y){
-            jogo.comidas.splice(i, 1)
-            snake.corpo.length%3 == 0 ? gerarParede() : null 
-            gerarComida()
-            snake.aumentar()
-
-        }
-    })
+    detectarColisao()
 
     jogo.paredes.forEach(parede => {
         parede.atualizar()
@@ -116,7 +126,18 @@ function loop() {
         document.querySelector('div.menu').style.display = 'flex'
     }else{
         window.requestAnimationFrame(loop)
-
     }
+}
 
+function detectarColisao() {
+    jogo.comidas.forEach((comida, i)=>{
+        comida.atualizar()
+
+        if(comida.posicao.x == snake.corpo[0].x && comida.posicao.y == snake.corpo[0].y){
+            jogo.comidas.splice(i, 1)
+            snake.corpo.length%3 == 0 ? gerarParede() : null 
+            gerarComida()
+            snake.aumentar()
+        }
+    })
 }
